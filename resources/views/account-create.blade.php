@@ -19,6 +19,7 @@
                         <select id="currency" name="currency" class="h-8 w-48 border rounded border-gray-400 mb-4">
                             <option value="EUR" selected>EUR</option>
                             <option value="USD">USD</option>
+                            <option value="CAD">CAD</option>
                         </select>
                         <br>
                         @if ($isInvestmentAccountCreated)

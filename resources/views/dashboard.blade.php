@@ -19,28 +19,14 @@
                     <h2 class="text-gray-800 font-semibold text-xl pb-3">Accounts</h2>
                     @foreach($accounts as $account)
                         @if ($account->type==='money')
-                            <div class="border-t border-gray-400 pb-3 hover:bg-yellow-50">
-                                <a href="/account/{{$account->id}}">
-                                    <div class="flex p-2 space-x-4 xs:flex-wrap sm:flex-nowrap xs:justify-end sm:justify-between">
-                                        <div class="xs:w-full sm:w-96">{{$account->name}}</div>
-                                        <div>{{sprintf('%0.2f %s',$account->transactions()->sum('amount')/100,$account->currency)}}</div>
-                                    </div>
-                                </a>
-                            </div>
+                            @include('components.accounts-list')
                         @endif
                     @endforeach
                     @if ($isInvestmentAccountCreated)
                         <h2 class="text-gray-800 font-semibold text-xl pb-3">Investment Account</h2>
                         @foreach($accounts as $account)
                             @if ($account->type==='investment')
-                                <div class="border-t border-gray-400 pb-3 hover:bg-yellow-50">
-                                    <a href="/account/{{$account->id}}">
-                                        <div class="flex p-2 space-x-4 xs:flex-wrap sm:flex-nowrap xs:justify-end sm:justify-between">
-                                            <div class="xs:w-full sm:w-96">{{$account->name}}</div>
-                                            <div>{{sprintf('%0.2f %s',$account->transactions()->sum('amount')/100,$account->currency)}}</div>
-                                        </div>
-                                    </a>
-                                </div>
+                                @include('components.accounts-list')
                             @endif
                         @endforeach
                     @endif

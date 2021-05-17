@@ -10,7 +10,7 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 bg-white border-b border-gray-200">
                     <x-jet-validation-errors class="mb-4" :errors="$errors"/>
-                    <form method="post" action="/account/create">
+                    <form method="post" action="/accounts">
                         @csrf
                         <label for="name" class="mr-2">Name your account:</label><br>
                         <input type="text" id="name" name="name" class="h-8 w-48 border rounded border-gray-400 mb-4">

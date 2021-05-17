@@ -4,7 +4,7 @@
             <h2 class="text-gray-800">
                 {{ __('Dashboard') }}
             </h2>
-            <form method="get" action="/account/show-form/create">
+            <form method="get" action="/accounts/create">
                 @csrf
                 <input type="submit" value="Create new account"
                        class="bg-white text-base hover:border-blue-500 hover:text-blue-500 px-2 border rounded border-gray-400">

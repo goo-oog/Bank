@@ -4,16 +4,13 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\Account;
-use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\View\View;
 
 class AccountsController extends Controller
 {
-    public function showCreateForm(): View
+    public function create()
     {
         $user = User::find(Auth::id());
         return view('account-create', [
@@ -21,7 +18,7 @@ class AccountsController extends Controller
         ]);
     }
 
-    public function create(Request $request)
+    public function store(Request $request)
     {
         $request->validate([
             'name' => ['required', 'max:32'],
@@ -35,47 +32,17 @@ class AccountsController extends Controller
             'currency' => $request->input('currency'),
             'type' => $request->input('type')
         ]);
-        return redirect('/dashboard');
+        return redirect()->route('dashboard');
     }
 
-    public function show(Request $request)
+    public function show(Account $account)
     {
-//        $user=User::find(Auth::id());
-//        $account=$user->accounts()->with('transactions')->find($request->route('id'));
-//        return Inertia::render('Account', [
-//            'account' => $account
-//        ]);
-        $user = User::find(Auth::id());
-        $account = $user->accounts()->with('transactions')->find($request->route('id'));
-        return view('account', [
-            'account' => $account,
-            'transactions' => $account->transactions()->orderByDesc('created_at')->get(),
-//            'sumIncoming' => $account->transactions()->where('amount', '>', 0)->sum('amount'),
-//            'sumOutgoing' => $account->transactions()->where('amount', '<', 0)->sum('amount')
-        ]);
+        if ($account->user_id === User::find(Auth::id())->id) {
+            return view('account', [
+                'account' => $account,
+                'transactions' => $account->transactions()->orderByDesc('created_at')->get(),
+            ]);
+        }
+        return redirect()->route('dashboard');
     }
-//    public function payment(Request $request)
-//    {
-//        $account=Account::find($request->input('id'));
-//        if(User::find(Auth::id())->accounts->contains($account)){
-//            $request->validate([
-//                'amount' => ['required', 'numeric', 'gt:1']
-//            ]);
-//            $transaction=new Transaction([
-//                'account_id'=>$account->id,
-//                'partner_account'=>$request->input('partner_account'),
-//                'description'=>$request->input('description'),
-//                'amount'=>(int)$request->input('amount'),
-//                'currency'=>$account->currency
-//            ]);
-//            $transaction->save();
-//
-//            return $transaction;
-//        }
-////        $user=User::find(Auth::id());
-////        /** @var Account $account */
-////        $account=$user->accounts()->find($request->input('id'));
-////        return $account;
-//        return Redirect::route('users.show', $transaction);
-//    }
 }

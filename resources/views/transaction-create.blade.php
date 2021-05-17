@@ -20,9 +20,8 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 bg-white border-b border-gray-200">
                     <x-jet-validation-errors class="mb-4" :errors="$errors"/>
-                    <form method="post" action="/transaction/add">
+                    <form method="post" action="/accounts/{{$account->id}}/transactions">
                         @csrf
-                        <input type="hidden" name="account_id" value="{{$account->id}}">
                         <label for="recipient_account" class="mr-2">Recipient's account number:</label><br>
                         <input type="text" id="recipient_account" name="recipient_account"
                                class="h-8 xs:w-full sm:w-96 border rounded border-gray-400 mb-8">

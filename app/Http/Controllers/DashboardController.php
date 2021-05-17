@@ -6,7 +6,6 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Services\CurrencyPropertiesService;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
@@ -17,7 +16,7 @@ class DashboardController extends Controller
         $this->currencyProps = $currencyProps;
     }
 
-    public function show(): View
+    public function __invoke()
     {
         $user = User::find(Auth::id());
         return view('dashboard', [

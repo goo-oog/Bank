@@ -7,10 +7,9 @@ use App\Models\Account;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Services\ConversionService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rule;
-use Illuminate\View\View;
 
 class TransactionsController extends Controller
 {
@@ -21,31 +20,30 @@ class TransactionsController extends Controller
         $this->conversion = $conversionService;
     }
 
-    public function showMakePaymentForm(Request $request)
+    public function create(Account $account)
     {
-        $account = Account::find($request->input('account_id'));
-        if (User::find(Auth::id())->accounts->contains($account)) {
-            return view('transaction-add', [
+        if ($account->user_id === User::find(Auth::id())->id) {
+            return view('transaction-create', [
                 'account' => $account,
             ]);
         }
-        return redirect('/dashboard');
-//        $request->validate([
-//            'account_id' => ['required', Rule::exists('wallets', 'id')->where('user_id', Auth::id())]
-//        ]);
-
+        return redirect()->route('dashboard');
     }
 
-    public function payment(Request $request)
+    public function store(Account $account, Request $request): RedirectResponse
     {
-        $account = Account::find($request->input('account_id'));
-        if (User::find(Auth::id())->accounts->contains($account)) {
+        if ($account->user_id === User::find(Auth::id())->id) {
             $request->merge(['amount' => str_replace(',', '.', $request->input('amount'))]);
             $request->validate([
                 'recipient_account' => ['required'],
-                'amount' => ['required', 'numeric', 'gt:0', 'lte:' . $account->transactions()->sum('amount') / 100],
+                'amount' => [
+                    'required',
+                    'numeric',
+                    'gt:0',
+                    'lte:' . $account->transactions()->sum('amount') / 100],
                 'description' => ['required', 'max:64']
             ]);
+            /** @noinspection UnnecessaryCastingInspection */
             $amount = (int)($request->input('amount') * 100);
             Transaction::create([
                 'account_id' => $account->id,
@@ -68,6 +66,6 @@ class TransactionsController extends Controller
                 ]);
             }
         }
-        return redirect('/account/' . $request->input('account_id'));
+        return redirect()->route('accounts.show', ['account' => $account->id]);
     }
 }

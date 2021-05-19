@@ -18,9 +18,9 @@ class CreateStocksTable extends Migration
             $table->foreignId('account_id')->constrained();
             $table->boolean('is_active')->default(true);
             $table->string('symbol');
-            $table->float('amount');
-            $table->bigInteger('buy_price');
-            $table->bigInteger('sell_price')->nullable();
+            $table->unsignedFloat('amount', 16, 8);
+            $table->unsignedFloat('buy_price', 16, 8);
+            $table->unsignedFloat('sell_price', 16, 8)->nullable();
 //            $table->bigInteger('profit')->nullable();
             $table->timestamps();
 //            $table->softDeletes();

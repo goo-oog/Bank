@@ -39,28 +39,41 @@
                                 <span class="text-base">{{ '$' }}</span>
                                 <span class="font-bold">{{ sprintf('%0.2f',$stockExchange->currentPrice(session('symbol'))) }}</span>
                             </div>
+
+                            <form method="post" action="/accounts/{{$account->id}}/stocks"
+                                  class="inline-flex flex-nowrap text-xs items-end">
+                                @csrf
+                                <input type="hidden" name="symbol" value="{{ session('symbol') }}">
+                                <div>
+                                    <label for="buy">Count</label><br>
+                                    <input type="text" id="buy" maxlength="8"
+                                           class="h-8 w-32 border rounded border-gray-400" name="amount"
+                                           pattern="^[0-9]+[\.]?[0-9]*$"
+                                           oninput="document.getElementById('buy-m').value='$'+Math.round(this.value*{{ $stockExchange->currentPrice(session('symbol')) }}*100)/100;
+                                                   document.getElementById('buy-button').disabled=
+                                                   document.getElementById('buy-m').value.substr(1)<=0 ||
+                                                   document.getElementById('buy-m').value.substr(1)>{{($account->transactions()->sum('amount'))/100}}">
+                                </div>
+                                <div class="ml-2">
+                                    <label for="buy-m">Money</label><br>
+                                    <input type="text" id="buy-m" maxlength="8"
+                                           class="h-8 w-32 border rounded border-gray-400"
+                                           pattern="^[\$]?[0-9]+[\.]?[0-9]*$"
+                                           oninput="this.value=this.value[0]==='$'?this.value:'$'+this.value;
+                                                   document.getElementById('buy').value=Math.round(this.value.substr(1)*1000000/{{ $stockExchange->currentPrice(session('symbol')) }})/1000000">
+                                </div>
+                                <input type="submit" id="buy-button"
+                                       class="w-20 h-8 bg-white text-base hover:border-blue-500 hover:text-blue-500 px-2 border rounded border-gray-400 ml-2"
+                                       value="Buy">
+                            </form>
+
+
+
+
+
                         @endif
                     </div>
                     <x-jet-validation-errors class="mb-4" :errors="$errors"/>
-                    {{--                    <form method="post" action="/accounts/{{$account->id}}/stocks">--}}
-                    {{--                        @csrf--}}
-                    {{--                        <label for="recipient_account" class="mr-2">Recipient's account number:</label><br>--}}
-                    {{--                        <input type="text" id="recipient_account" name="recipient_account"--}}
-                    {{--                               class="h-8 xs:w-full sm:w-96 border rounded border-gray-400 mb-8">--}}
-                    {{--                        <br>--}}
-                    {{--                        <label for="amount" class="mr-2">Amount:</label><br>--}}
-                    {{--                        <input type="text" id="amount" name="amount"--}}
-                    {{--                               class="h-8 xs:w-1/2 sm:w-48 border rounded border-gray-400 mb-8"--}}
-                    {{--                               maxlength="12" pattern="[0-9]+([\.,][0-9]{1,2})?">--}}
-                    {{--                        <span class="font-semibold text-xl"> {{$account->currency}}</span>--}}
-                    {{--                        <br>--}}
-                    {{--                        <label for="description" class="mr-2">Description:</label><br>--}}
-                    {{--                        <input type="text" id="description" name="description"--}}
-                    {{--                               class="h-8 xs:w-full sm:w-96 border rounded border-gray-400 mb-8">--}}
-                    {{--                        <br>--}}
-                    {{--                        <input type="submit" value="Pay"--}}
-                    {{--                               class="w-48 h-8 bg-white text-base hover:border-blue-500 hover:text-blue-500 px-2 border rounded border-gray-400">--}}
-                    {{--                    </form>--}}
                 </div>
             </div>
         </div>

@@ -40,7 +40,8 @@ class TransactionsController extends Controller
                     'required',
                     'numeric',
                     'gt:0',
-                    'lte:' . $account->transactions()->sum('amount') / 100],
+                    'lte:' . $account->transactions()->sum('amount') / 100
+                ],
                 'description' => ['required', 'max:64']
             ]);
             /** @noinspection UnnecessaryCastingInspection */

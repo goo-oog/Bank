@@ -15,13 +15,6 @@
                         <label for="name" class="mr-2">Name your account:</label><br>
                         <input type="text" id="name" name="name" class="h-8 w-48 border rounded border-gray-400 mb-4">
                         <br>
-                        <label for="currency" class="mr-2">Choose currency:</label><br>
-                        <select id="currency" name="currency" class="h-8 w-48 border rounded border-gray-400 mb-4">
-                            <option value="EUR" selected>EUR</option>
-                            <option value="USD">USD</option>
-                            <option value="CAD">CAD</option>
-                        </select>
-                        <br>
                         @if ($isInvestmentAccountCreated)
                             <input type="hidden" name="type" value="money">
                         @else
@@ -31,6 +24,13 @@
                                 <option value="investment">Investment</option>
                             </select>
                         @endif
+                        <br>
+                        <label for="currency" class="mr-2">Choose currency:</label><br>
+                        <select id="currency" name="currency" class="h-8 w-48 border rounded border-gray-400 mb-4">
+                            <option value="EUR" selected>EUR</option>
+                            <option value="USD">USD</option>
+                            <option value="CAD">CAD</option>
+                        </select>
                         <br><br>
                         <input type="submit" value="Create new account"
                                class="w-48 h-8 bg-white text-base hover:border-blue-500 hover:text-blue-500 px-2 border rounded border-gray-400">

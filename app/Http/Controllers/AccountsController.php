@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\Account;
+use App\Models\Transaction;
 use App\Models\User;
 use App\Repositories\StockExchangeRepository;
 use App\Services\ActiveStocksValueService;
@@ -34,15 +35,26 @@ class AccountsController extends Controller
         $request->validate([
             'name' => ['required', 'max:32'],
             'currency' => ['required'],
-            'type' => ['required']
+            'type' => ['required'],
+            'gift' => ['required', 'numeric', 'gte:0']
         ]);
-        Account::create([
+        $account = new Account([
             'user_id' => Auth::id(),
             'name' => $request->input('name'),
             'number' => hash('crc32', microtime()),
             'currency' => $request->input('currency'),
             'type' => $request->input('type')
         ]);
+        $account->save();
+        if ($request->input('gift')) {
+            Transaction::create([
+                'account_id' => $account->id,
+                'partner_account' => 'Bank',
+                'description' => 'Gift from bank',
+                'amount' => $request->input('gift') * 100,
+                'currency' => $account->currency
+            ]);
+        }
         return redirect()->route('dashboard');
     }
 

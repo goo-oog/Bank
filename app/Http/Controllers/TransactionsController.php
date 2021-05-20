@@ -10,6 +10,7 @@ use App\Services\ConversionService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class TransactionsController extends Controller
 {
@@ -32,10 +33,13 @@ class TransactionsController extends Controller
 
     public function store(Account $account, Request $request): RedirectResponse
     {
-        if ($account->user_id === User::find(Auth::id())->id) {
+        $user = User::find(Auth::id());
+        if ($account->user_id === $user->id) {
             $request->merge(['amount' => str_replace(',', '.', $request->input('amount'))]);
             $request->validate([
-                'recipient_account' => ['required'],
+                'recipient_account' => [
+                    'required',
+                ],
                 'amount' => [
                     'required',
                     'numeric',
@@ -44,8 +48,24 @@ class TransactionsController extends Controller
                 ],
                 'description' => ['required', 'max:64']
             ]);
+            if ($account->type === 'investment') {
+                $request->validate([
+                    'recipient_account' => [
+                        Rule::in($user->accounts()->pluck('number')->toArray())
+                    ]
+                ]);
+            }
             /** @noinspection UnnecessaryCastingInspection */
             $amount = (int)($request->input('amount') * 100);
+            $moneyTransactionsBalance = $account->transactions()->where('type', 'money')->sum('amount');
+            if ($account->type === 'investment' && $moneyTransactionsBalance - $amount < 0) {
+                if ($moneyTransactionsBalance < 0) {
+                    $tax = (int)round($amount * 0.2);
+                } else {
+                    $tax = (int)round(($amount - $moneyTransactionsBalance) * 0.2);
+                }
+            }
+
             Transaction::create([
                 'account_id' => $account->id,
                 'partner_account' => $request->input('recipient_account'),
@@ -57,6 +77,9 @@ class TransactionsController extends Controller
             if ($recipientAccount) {
                 if ($recipientAccount->currency !== $account->currency) {
                     $amount = $this->conversion->do($account->currency, $recipientAccount->currency, $amount);
+                    if (isset($tax)) {
+                        $tax = $this->conversion->do($account->currency, $recipientAccount->currency, $tax);
+                    }
                 }
                 Transaction::create([
                     'account_id' => $recipientAccount->id,
@@ -65,6 +88,16 @@ class TransactionsController extends Controller
                     'amount' => $amount,
                     'currency' => $recipientAccount->currency
                 ]);
+                if (isset($tax)) {
+                    Transaction::create([
+                        'account_id' => $recipientAccount->id,
+                        'partner_account' => 'Treasury',
+                        'description' => sprintf('Capital gains tax: %0.2f %s', $tax / 100, $recipientAccount->currency),
+                        'amount' => -$tax,
+                        'currency' => $recipientAccount->currency,
+                        'type' => 'tax'
+                    ]);
+                }
             }
         }
         return redirect()->route('accounts.show', ['account' => $account->id]);

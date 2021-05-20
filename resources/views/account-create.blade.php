@@ -31,7 +31,11 @@
                             <option value="USD">USD</option>
                             <option value="CAD">CAD</option>
                         </select>
-                        <br><br>
+                        <br>
+                        <label for="gift" class="mr-2">Starting balance:</label><br>
+                        <input type="text" id="gift" name="gift" value="0"
+                               class="h-8 w-48 border rounded border-gray-400 mb-4">
+                        <br>
                         <input type="submit" value="Create new account"
                                class="w-48 h-8 bg-white text-base hover:border-blue-500 hover:text-blue-500 px-2 border rounded border-gray-400">
                     </form>

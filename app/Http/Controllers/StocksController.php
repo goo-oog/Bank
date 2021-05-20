@@ -54,7 +54,7 @@ class StocksController extends Controller
                     'required',
                     'numeric',
                     'gt:0',
-                    'lte:' . ($balance - $toPay)
+                    'lte:' . (round($balance / $price * 10000) / 100000)
                 ],
             ]);
             Stock::create([
@@ -83,7 +83,7 @@ class StocksController extends Controller
     {
         if ($account->user_id === Auth::user()->id) {
             $price = $this->stockExchange->currentPrice($stock->symbol);
-            $toReceive = (int)($price * $stock->amount * 100);
+            $toReceive = (int)round($price * $stock->amount * 100);
             $stock->update([
                 'is_active' => false,
                 'sell_price' => $price

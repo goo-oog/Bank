@@ -15,3 +15,4 @@
         </div>
     </div>
 @endforeach
+{{ $transactions->links() }}

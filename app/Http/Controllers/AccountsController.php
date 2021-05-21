@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 use App\Models\Account;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Repositories\CurrencyRatesRepository;
 use App\Repositories\StockExchangeRepository;
 use App\Services\ActiveStocksValueService;
 use Illuminate\Http\Request;
@@ -15,18 +16,25 @@ class AccountsController extends Controller
 {
     private StockExchangeRepository $stockExchange;
     private ActiveStocksValueService $activeStocksValue;
+    private CurrencyRatesRepository $currencyRates;
 
-    public function __construct(StockExchangeRepository $stockExchange, ActiveStocksValueService $activeStocksValue)
+    public function __construct(
+        StockExchangeRepository $stockExchange,
+        ActiveStocksValueService $activeStocksValue,
+        CurrencyRatesRepository $currencyRates
+    )
     {
         $this->stockExchange = $stockExchange;
         $this->activeStocksValue = $activeStocksValue;
+        $this->currencyRates = $currencyRates;
     }
 
     public function create()
     {
         $user = User::find(Auth::id());
         return view('account-create', [
-            'isInvestmentAccountCreated' => $user->accounts()->where('type', 'investment')->exists()
+            'isInvestmentAccountCreated' => $user->accounts()->where('type', 'investment')->exists(),
+            'symbols' => $this->currencyRates->getAllSymbols()
         ]);
     }
 
@@ -36,7 +44,7 @@ class AccountsController extends Controller
             'name' => ['required', 'max:32'],
             'currency' => ['required'],
             'type' => ['required'],
-            'gift' => ['required', 'numeric', 'gte:0']
+            'initial_balance' => ['required', 'numeric', 'gte:0']
         ]);
         $account = new Account([
             'user_id' => Auth::id(),
@@ -46,12 +54,12 @@ class AccountsController extends Controller
             'type' => $request->input('type')
         ]);
         $account->save();
-        if ($request->input('gift')) {
+        if ($request->input('initial_balance')) {
             Transaction::create([
                 'account_id' => $account->id,
-                'partner_account' => 'Bank',
-                'description' => 'Gift from bank',
-                'amount' => $request->input('gift') * 100,
+                'partner_account' => 'Self',
+                'description' => 'Initial balance',
+                'amount' => $request->input('initial_balance') * 100,
                 'currency' => $account->currency
             ]);
         }
@@ -63,7 +71,7 @@ class AccountsController extends Controller
         if ($account->user_id === Auth::user()->id) {
             return view('account', [
                 'account' => $account,
-                'transactions' => $account->transactions()->orderByDesc('created_at')->get(),
+                'transactions' => $account->transactions()->orderByDesc('created_at')->paginate(10),
                 'stocks' => $account->stocks()->orderByDesc('is_active')->orderByDesc('created_at')->get(),
                 'stockExchange' => $this->stockExchange,
                 'activeStocksValue' => $this->activeStocksValue->get($account) / 100,

@@ -23,8 +23,15 @@
                     <form method="post" action="/accounts/{{$account->id}}/transactions">
                         @csrf
                         <label for="recipient_account" class="mr-2">Recipient's account number:</label><br>
-                        <input type="text" id="recipient_account" name="recipient_account"
+                        <input type="text" autocomplete="off" list="accounts" name="recipient_account"
                                class="h-8 xs:w-full sm:w-96 border rounded border-gray-400 mb-8">
+                        <datalist id="accounts">
+                            @foreach($userAccounts as $userAccount)
+                                <option value={{$userAccount->number}}>
+                                    {{ucfirst($userAccount->type).' account: '.$userAccount->name.' '.$userAccount->number.' '.$userAccount->currency}}
+                                </option>
+                            @endforeach
+                        </datalist>
                         <br>
                         <label for="amount" class="mr-2">Amount:</label><br>
                         <input type="text" id="amount" name="amount"

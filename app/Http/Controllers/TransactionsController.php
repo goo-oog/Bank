@@ -23,9 +23,11 @@ class TransactionsController extends Controller
 
     public function create(Account $account)
     {
-        if ($account->user_id === User::find(Auth::id())->id) {
+        $user = User::find(Auth::id());
+        if ($account->user_id === $user->id) {
             return view('transaction-create', [
                 'account' => $account,
+                'userAccounts' => $user->accounts()->get()->except($account->id)
             ]);
         }
         return redirect()->route('dashboard');
@@ -43,8 +45,7 @@ class TransactionsController extends Controller
                 'amount' => [
                     'required',
                     'numeric',
-                    'gt:0',
-                    'lte:' . $account->transactions()->sum('amount') / 100
+                    'between:0,' . $account->transactions()->sum('amount') / 100
                 ],
                 'description' => ['required', 'max:64']
             ]);
@@ -69,7 +70,7 @@ class TransactionsController extends Controller
             Transaction::create([
                 'account_id' => $account->id,
                 'partner_account' => $request->input('recipient_account'),
-                'description' => $request->input('description'),
+                'description' => 'To: ' . $request->input('recipient_account') . ', ' . $request->input('description'),
                 'amount' => -$amount,
                 'currency' => $account->currency
             ]);
@@ -84,7 +85,7 @@ class TransactionsController extends Controller
                 Transaction::create([
                     'account_id' => $recipientAccount->id,
                     'partner_account' => $account->number,
-                    'description' => $request->input('description'),
+                    'description' => 'From: ' . $account->user->name . ', ' . $recipientAccount->number . ', ' . $request->input('description'),
                     'amount' => $amount,
                     'currency' => $recipientAccount->currency
                 ]);

@@ -6,7 +6,7 @@ namespace App\Repositories;
 use Illuminate\Support\Facades\Cache;
 use JsonException;
 
-class FinnhubRepository implements StockExchangeRepository
+class FinnhubStockExchangeRepository implements StockExchangeRepository
 {
     /**
      * @throws JsonException

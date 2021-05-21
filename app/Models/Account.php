@@ -3,10 +3,13 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Eloquent;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
-//use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 
 /**
  * App\Models\Account
@@ -17,31 +20,31 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $name
  * @property string $currency
  * @property string $type
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Stock[] $stocks
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Collection|Stock[] $stocks
  * @property-read int|null $stocks_count
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Transaction[] $transactions
+ * @property-read Collection|Transaction[] $transactions
  * @property-read int|null $transactions_count
- * @property-read \App\Models\User $user
- * @method static \Illuminate\Database\Eloquent\Builder|Account newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Account newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Account query()
- * @method static \Illuminate\Database\Eloquent\Builder|Account whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Account whereCurrency($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Account whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Account whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Account whereNumber($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Account whereType($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Account whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Account whereUserId($value)
- * @mixin \Eloquent
+ * @property-read User $user
+ * @method static Builder|Account newModelQuery()
+ * @method static Builder|Account newQuery()
+ * @method static Builder|Account query()
+ * @method static Builder|Account whereCreatedAt($value)
+ * @method static Builder|Account whereCurrency($value)
+ * @method static Builder|Account whereId($value)
+ * @method static Builder|Account whereName($value)
+ * @method static Builder|Account whereNumber($value)
+ * @method static Builder|Account whereType($value)
+ * @method static Builder|Account whereUpdatedAt($value)
+ * @method static Builder|Account whereUserId($value)
+ * @mixin Eloquent
  */
 class Account extends Model
 {
     use HasFactory;
 
-//    use SoftDeletes;
+    use SoftDeletes;
 
     protected $fillable = [
         'user_id',

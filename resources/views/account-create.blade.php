@@ -28,12 +28,13 @@
                         <label for="currency" class="mr-2">Choose currency:</label><br>
                         <select id="currency" name="currency" class="h-8 w-48 border rounded border-gray-400 mb-4">
                             <option value="EUR" selected>EUR</option>
-                            <option value="USD">USD</option>
-                            <option value="CAD">CAD</option>
+                            @foreach($symbols as $symbol)
+                                <option value={{$symbol}}>{{$symbol}}</option>
+                            @endforeach
                         </select>
                         <br>
-                        <label for="gift" class="mr-2">Starting balance:</label><br>
-                        <input type="text" id="gift" name="gift" value="0"
+                        <label for="initial_balance" class="mr-2">Starting balance:</label><br>
+                        <input type="text" id="initial_balance" name="initial_balance" value="0"
                                class="h-8 w-48 border rounded border-gray-400 mb-4">
                         <br>
                         <input type="submit" value="Create new account"

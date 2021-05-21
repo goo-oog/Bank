@@ -70,7 +70,7 @@
                                     {{sprintf('%0.2f %s',($stock->sell_price-$stock->buy_price)*$stock->amount,$account->currency)}}
                                 </div>
                             </div>
-                            <div class="w-8 mx-2 text-xs {{$stockExchange->currentPrice($stock->symbol)>=$stock->buy_price?'text-green-600':'text-red-600'}}">
+                            <div class="w-8 mx-2 text-xs {{$stock->sell_price>=$stock->buy_price?'text-green-600':'text-red-600'}}">
                                 {{sprintf('%0.1f %%',(($stock->sell_price/$stock->buy_price-1)*100))}}
                             </div>
                         @endif

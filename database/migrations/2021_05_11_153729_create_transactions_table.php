@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -22,7 +23,7 @@ class CreateTransactionsTable extends Migration
             $table->string('currency');
             $table->string('type')->default('money');
             $table->timestamps();
-//            $table->softDeletes();
+            $table->softDeletes();
         });
     }
 

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -21,9 +22,8 @@ class CreateStocksTable extends Migration
             $table->unsignedFloat('amount', 16, 8);
             $table->unsignedFloat('buy_price', 16, 8);
             $table->unsignedFloat('sell_price', 16, 8)->nullable();
-//            $table->bigInteger('profit')->nullable();
             $table->timestamps();
-//            $table->softDeletes();
+            $table->softDeletes();
         });
     }
 

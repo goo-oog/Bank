@@ -33,8 +33,9 @@ class TransactionsController extends Controller
         return redirect()->route('dashboard');
     }
 
-    public function store(Account $account, Request $request): RedirectResponse
+    public function store(Account $account, Request $request)
     {
+//        return view('auth.two-factor-challenge');
         $user = User::find(Auth::id());
         if ($account->user_id === $user->id) {
             $request->merge(['amount' => str_replace(',', '.', $request->input('amount'))]);
@@ -66,7 +67,6 @@ class TransactionsController extends Controller
                     $tax = (int)round(($amount - $moneyTransactionsBalance) * 0.2);
                 }
             }
-
             Transaction::create([
                 'account_id' => $account->id,
                 'partner_account' => $request->input('recipient_account'),

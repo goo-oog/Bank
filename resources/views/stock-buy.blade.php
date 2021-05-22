@@ -24,7 +24,7 @@
                               class="inline-flex flex-nowrap justify-center items-center">
                             <label for="search" class="whitespace-nowrap">Search for stock:</label>
                             <input type="search" id="search" maxlength="5" name="symbol" required
-                                   value="{{session('symbol')??''}}"
+                                   value="{{session('symbol')??old('symbol')}}"
                                    class="h-8 w-20 border rounded border-gray-400 ml-2 text-center"
                                    oninput="this.value = this.value.toUpperCase();
                                         document.getElementById('search-form').action='/stocks/'+this.value+'/search'">
@@ -39,7 +39,6 @@
                                 <span class="text-base">{{ '$' }}</span>
                                 <span class="font-bold">{{ sprintf('%0.2f',$stockExchange->currentPrice(session('symbol'))) }}</span>
                             </div>
-
                             <form method="post" action="/accounts/{{$account->id}}/stocks"
                                   class="inline-flex flex-nowrap text-xs items-end">
                                 @csrf
@@ -66,11 +65,6 @@
                                        class="w-20 h-8 bg-white text-base hover:border-blue-500 hover:text-blue-500 px-2 border rounded border-gray-400 ml-2"
                                        value="Buy">
                             </form>
-
-
-
-
-
                         @endif
                     </div>
                     <x-jet-validation-errors class="mb-4" :errors="$errors"/>

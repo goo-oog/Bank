@@ -28,12 +28,14 @@ class StocksController extends Controller
         if (isset($check->name)) {
             return redirect()->back()->with(['symbol' => $symbol]);
         }
-        session()->forget('symbol');
         return redirect()->back();
     }
 
     public function create(Account $account)
     {
+        if (old('symbol')) {
+            session(['symbol' => old('symbol')]);
+        }
         if ($account->user_id === Auth::user()->id) {
             return view('stock-buy', [
                 'account' => $account,
@@ -76,6 +78,7 @@ class StocksController extends Controller
                 'type' => 'investment'
             ]);
         }
+        session()->forget('symbol');
         return redirect()->route('accounts.show', ['account' => $account->id]);
     }
 

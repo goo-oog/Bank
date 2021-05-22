@@ -24,6 +24,7 @@
                         @csrf
                         <label for="recipient_account" class="mr-2">Recipient's account number:</label><br>
                         <input type="text" autocomplete="off" list="accounts" name="recipient_account"
+                               value="{{ old('recipient_account') }}"
                                class="h-8 xs:w-full sm:w-96 border rounded border-gray-400 mb-8">
                         <datalist id="accounts">
                             @foreach($userAccounts as $userAccount)
@@ -34,13 +35,13 @@
                         </datalist>
                         <br>
                         <label for="amount" class="mr-2">Amount:</label><br>
-                        <input type="text" id="amount" name="amount"
+                        <input type="text" id="amount" name="amount" value="{{ old('amount') }}"
                                class="h-8 xs:w-1/2 sm:w-48 border rounded border-gray-400 mb-8"
                                maxlength="12" pattern="[0-9]+([\.,][0-9]{1,2})?">
                         <span class="font-semibold text-xl"> {{$account->currency}}</span>
                         <br>
                         <label for="description" class="mr-2">Description:</label><br>
-                        <input type="text" id="description" name="description"
+                        <input type="text" id="description" name="description" value="{{ old('description') }}"
                                class="h-8 xs:w-full sm:w-96 border rounded border-gray-400 mb-8">
                         <br>
                         <input type="submit" value="Pay"

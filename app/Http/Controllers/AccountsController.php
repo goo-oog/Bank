@@ -49,7 +49,7 @@ class AccountsController extends Controller
         $account = new Account([
             'user_id' => Auth::id(),
             'name' => $request->input('name'),
-            'number' => hash('crc32', microtime()),
+            'number' => strtoupper(hash('crc32', microtime())),
             'currency' => $request->input('currency'),
             'type' => $request->input('type')
         ]);
@@ -71,7 +71,7 @@ class AccountsController extends Controller
         if ($account->user_id === Auth::user()->id) {
             return view('account', [
                 'account' => $account,
-                'transactions' => $account->transactions()->orderByDesc('created_at')->paginate(10),
+                'transactions' => $account->transactions()->orderByDesc('created_at')->paginate(5),
                 'stocks' => $account->stocks()->orderByDesc('is_active')->orderByDesc('created_at')->get(),
                 'stockExchange' => $this->stockExchange,
                 'activeStocksValue' => $this->activeStocksValue->get($account) / 100,

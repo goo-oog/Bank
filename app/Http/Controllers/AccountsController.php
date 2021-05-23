@@ -29,6 +29,9 @@ class AccountsController extends Controller
         $this->currencyRates = $currencyRates;
     }
 
+    /**
+     * Show 'create account' form
+     */
     public function create()
     {
         $user = User::find(Auth::id());
@@ -38,6 +41,9 @@ class AccountsController extends Controller
         ]);
     }
 
+    /**
+     * Create account
+     */
     public function store(Request $request)
     {
         $request->validate([
@@ -66,6 +72,9 @@ class AccountsController extends Controller
         return redirect()->route('dashboard');
     }
 
+    /**
+     * Show account with transactions an stocks
+     */
     public function show(Account $account)
     {
         if ($account->user_id === Auth::user()->id) {

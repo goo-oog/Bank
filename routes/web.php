@@ -22,9 +22,24 @@ Route::view('/', 'welcome');
 
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
-    Route::resource('accounts', AccountsController::class)->only(['create', 'store', 'show']);
-    Route::resource('accounts.transactions', TransactionsController::class)->only(['create', 'store']);
-    Route::resources(['accounts.stocks' => StocksController::class]);
+    Route::resource('accounts', AccountsController::class)
+        ->only([
+            'create',
+            'store',
+            'show'
+        ]);
+    Route::resource('accounts.transactions', TransactionsController::class)
+        ->only([
+            'create',
+            'store'
+        ]);
+    Route::resource('accounts.stocks', StocksController::class)
+        ->only([
+            'create',
+            'store',
+            'update',
+            'destroy'
+        ]);
     Route::get('/stocks/{symbol}/search', [StocksController::class, 'search']);
 });
 

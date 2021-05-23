@@ -22,15 +22,21 @@ class StocksController extends Controller
         $this->conversion = $conversionService;
     }
 
+    /**
+     * Search for stocks
+     */
     public function search(string $symbol)
     {
-        $check = $this->stockExchange->info($symbol);
-        if (isset($check->name)) {
+        $checkIfSymbolExists = $this->stockExchange->info($symbol);
+        if (isset($checkIfSymbolExists->name)) {
             return redirect()->back()->with(['symbol' => $symbol]);
         }
         return redirect()->back();
     }
 
+    /**
+     * Show 'stocks search' form
+     */
     public function create(Account $account)
     {
         if (old('symbol')) {
@@ -45,6 +51,9 @@ class StocksController extends Controller
         return redirect()->route('dashboard');
     }
 
+    /**
+     * Buy stocks
+     */
     public function store(Account $account, Request $request)
     {
         if ($account->user_id === Auth::user()->id) {
@@ -82,6 +91,9 @@ class StocksController extends Controller
         return redirect()->route('accounts.show', ['account' => $account->id]);
     }
 
+    /**
+     * Sell stocks
+     */
     public function update(Account $account, Stock $stock)
     {
         if ($account->user_id === Auth::user()->id) {
@@ -107,6 +119,9 @@ class StocksController extends Controller
         return redirect()->route('accounts.show', ['account' => $account->id]);
     }
 
+    /**
+     * Delete sold stocks
+     */
     public function destroy(Account $account, Stock $stock)
     {
         if ($account->user_id === Auth::user()->id) {

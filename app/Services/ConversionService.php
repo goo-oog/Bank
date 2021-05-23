@@ -15,7 +15,7 @@ class ConversionService
         $this->currencyRates = $currencyRates;
     }
 
-    public function do(string $fromSymbol, string $toSymbol, int $amount): int
+    public function do(string $fromSymbol, string $toSymbol, $amount): int
     {
         $this->currencyRates->getRates();
         $fromCurrency = Currency::find($fromSymbol);

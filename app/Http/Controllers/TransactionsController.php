@@ -7,7 +7,6 @@ use App\Models\Account;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Services\ConversionService;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -21,6 +20,9 @@ class TransactionsController extends Controller
         $this->conversion = $conversionService;
     }
 
+    /**
+     * Show 'make payment' form
+     */
     public function create(Account $account)
     {
         $user = User::find(Auth::id());
@@ -33,6 +35,9 @@ class TransactionsController extends Controller
         return redirect()->route('dashboard');
     }
 
+    /**
+     * Make payment
+     */
     public function store(Account $account, Request $request)
     {
 //        return view('auth.two-factor-challenge');
@@ -50,6 +55,7 @@ class TransactionsController extends Controller
                 ],
                 'description' => ['required', 'max:64']
             ]);
+            // Restrict transactions from an investment account only to money account owned by the same user
             if ($account->type === 'investment') {
                 $request->validate([
                     'recipient_account' => [
@@ -57,9 +63,9 @@ class TransactionsController extends Controller
                     ]
                 ]);
             }
-            /** @noinspection UnnecessaryCastingInspection */
-            $amount = (int)($request->input('amount') * 100);
+            $amount = $request->input('amount') * 100;
             $moneyTransactionsBalance = $account->transactions()->where('type', 'money')->sum('amount');
+            // Calculate 20% tax if withdrawal exceeds the sum of deposits
             if ($account->type === 'investment' && $moneyTransactionsBalance - $amount < 0) {
                 if ($moneyTransactionsBalance < 0) {
                     $tax = (int)round($amount * 0.2);
@@ -67,6 +73,7 @@ class TransactionsController extends Controller
                     $tax = (int)round(($amount - $moneyTransactionsBalance) * 0.2);
                 }
             }
+            // Outgoing transaction
             Transaction::create([
                 'account_id' => $account->id,
                 'partner_account' => $request->input('recipient_account'),
@@ -76,12 +83,14 @@ class TransactionsController extends Controller
             ]);
             $recipientAccount = Account::where('number', $request->input('recipient_account'))->first();
             if ($recipientAccount) {
+                // Apply currency conversion if currencies do not match
                 if ($recipientAccount->currency !== $account->currency) {
                     $amount = $this->conversion->do($account->currency, $recipientAccount->currency, $amount);
                     if (isset($tax)) {
                         $tax = $this->conversion->do($account->currency, $recipientAccount->currency, $tax);
                     }
                 }
+                // Incoming transaction if account is opened in this bank
                 Transaction::create([
                     'account_id' => $recipientAccount->id,
                     'partner_account' => $account->number,
@@ -89,6 +98,7 @@ class TransactionsController extends Controller
                     'amount' => $amount,
                     'currency' => $recipientAccount->currency
                 ]);
+                // Applying tax if calculated
                 if (isset($tax)) {
                     Transaction::create([
                         'account_id' => $recipientAccount->id,

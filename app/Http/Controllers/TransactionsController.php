@@ -40,7 +40,6 @@ class TransactionsController extends Controller
      */
     public function store(Account $account, Request $request)
     {
-//        return view('auth.two-factor-challenge');
         $user = User::find(Auth::id());
         if ($account->user_id === $user->id) {
             $request->merge(['amount' => str_replace(',', '.', $request->input('amount'))]);

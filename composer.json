@@ -1,10 +1,11 @@
 {
-    "name": "laravel/laravel",
+    "name": "gints/tiny_bank",
     "type": "project",
-    "description": "The Laravel Framework.",
+    "description": "Tiny Bank",
     "keywords": [
         "framework",
-        "laravel"
+        "laravel",
+        "finance"
     ],
     "license": "MIT",
     "require": {

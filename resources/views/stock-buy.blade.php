@@ -47,10 +47,7 @@
                                     <input type="text" id="buy" maxlength="8"
                                            class="h-8 w-28 border rounded border-gray-400" name="amount"
                                            pattern="^[0-9]+[\.]?[0-9]*$"
-                                           oninput="document.getElementById('buy-m').value='$'+Math.round(this.value*{{ $stockExchange->currentPrice(session('symbol')) }}*100)/100;
-                                                   document.getElementById('buy-button').disabled=
-                                                   document.getElementById('buy-m').value.substr(1)<=0 ||
-                                                   document.getElementById('buy-m').value.substr(1)>{{($account->transactions()->sum('amount'))/100}}">
+                                           oninput="document.getElementById('buy-m').value='$'+Math.round(this.value*{{ $stockExchange->currentPrice(session('symbol')) }}*100)/100">
                                 </div>
                                 <div class="ml-2">
                                     <label for="buy-m">Money</label><br>

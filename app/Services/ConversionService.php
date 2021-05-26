@@ -27,6 +27,6 @@ class ConversionService
         } else {
             $result = $amount * $toCurrency->rate / $fromCurrency->rate;
         }
-        return (int)$result;
+        return (int)round($result);
     }
 }

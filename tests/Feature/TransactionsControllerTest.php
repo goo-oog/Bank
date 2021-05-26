@@ -50,10 +50,16 @@ class TransactionsControllerTest extends TestCase
             'user_id' => $user->id,
             'currency' => 'USD'
         ]);
+        session([
+            'code' => '12345',
+            'input' => [
+                'recipient_account' => $recipientAccount->number,
+                'amount' => '13.87',
+                'description' => 'Payment for BigMac'
+            ]
+        ]);
         $response = $this->post(route('accounts.transactions.store', $account), [
-            'recipient_account' => $recipientAccount->number,
-            'amount' => '13,87',
-            'description' => 'Payment for BigMac'
+            'code' => '12345',
         ]);
         $this->assertDatabaseHas('transactions', [
             'account_id' => $account->id,

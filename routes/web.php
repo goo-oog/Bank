@@ -41,5 +41,6 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
             'destroy'
         ]);
     Route::get('/stocks/{symbol}/search', [StocksController::class, 'search']);
+    Route::get('/code/{account}', [TransactionsController::class, 'askCode']);
 });
 

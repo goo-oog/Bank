@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendSecurityCodeJob;
 use App\Models\Account;
 use App\Models\Transaction;
 use App\Models\User;
@@ -35,34 +36,53 @@ class TransactionsController extends Controller
         return redirect()->route('dashboard');
     }
 
+    public function askCode(Account $account, Request $request)
+    {
+        $user = User::find(Auth::id());
+        $request->merge(['amount' => str_replace(',', '.', $request->input('amount'))]);
+        $request->validate([
+            'recipient_account' => [
+                'required',
+            ],
+            'amount' => [
+                'required',
+                'numeric',
+                'between:0,' . $account->transactions()->sum('amount') / 100
+            ],
+            'description' => ['required', 'max:64']
+        ]);
+        // Restrict transactions from an investment account only to money account owned by the same user
+        if ($account->type === 'investment') {
+            $request->validate([
+                'recipient_account' => [
+                    Rule::in($user->accounts()->pluck('number')->toArray())
+                ]
+            ]);
+        }
+        $request->session()->flash('input', $request->input());
+        // Generate security code and send it as email
+        session(['code' => (string)rand(10000, 99999)]);
+        $this->dispatch(new SendSecurityCodeJob($user, session('code')));
+        return view('ask-verification-code', [
+            'account' => $account,
+        ]);
+    }
+
     /**
      * Make payment
      */
     public function store(Account $account, Request $request)
     {
+        session(['message' => 'Check your email again and enter the new code here:']);
+        $request->validate([
+            'code' => [
+                'required',
+                Rule::in(session('code'))
+            ]
+        ]);
         $user = User::find(Auth::id());
-        if ($account->user_id === $user->id) {
-            $request->merge(['amount' => str_replace(',', '.', $request->input('amount'))]);
-            $request->validate([
-                'recipient_account' => [
-                    'required',
-                ],
-                'amount' => [
-                    'required',
-                    'numeric',
-                    'between:0,' . $account->transactions()->sum('amount') / 100
-                ],
-                'description' => ['required', 'max:64']
-            ]);
-            // Restrict transactions from an investment account only to money account owned by the same user
-            if ($account->type === 'investment') {
-                $request->validate([
-                    'recipient_account' => [
-                        Rule::in($user->accounts()->pluck('number')->toArray())
-                    ]
-                ]);
-            }
-            $amount = $request->input('amount') * 100;
+        if ($account->user_id === $user->id && session('code') === $request->input('code')) {
+            $amount = session('input')['amount'] * 100;
             $moneyTransactionsBalance = $account->transactions()->where('type', 'money')->sum('amount');
             // Calculate 20% tax if withdrawal exceeds the sum of deposits
             if ($account->type === 'investment' && $moneyTransactionsBalance - $amount < 0) {
@@ -75,12 +95,12 @@ class TransactionsController extends Controller
             // Outgoing transaction
             Transaction::create([
                 'account_id' => $account->id,
-                'partner_account' => $request->input('recipient_account'),
-                'description' => 'To: ' . $request->input('recipient_account') . ', ' . $request->input('description'),
+                'partner_account' => session('input')['recipient_account'],
+                'description' => 'To: ' . session('input')['recipient_account'] . ', ' . session('input')['description'],
                 'amount' => -$amount,
                 'currency' => $account->currency
             ]);
-            $recipientAccount = Account::where('number', $request->input('recipient_account'))->first();
+            $recipientAccount = Account::where('number', session('input')['recipient_account'])->first();
             if ($recipientAccount) {
                 // Apply currency conversion if currencies do not match
                 if ($recipientAccount->currency !== $account->currency) {
@@ -93,7 +113,7 @@ class TransactionsController extends Controller
                 Transaction::create([
                     'account_id' => $recipientAccount->id,
                     'partner_account' => $account->number,
-                    'description' => 'From: ' . $account->user->name . ', ' . $recipientAccount->number . ', ' . $request->input('description'),
+                    'description' => 'From: ' . $account->user->name . ', ' . $recipientAccount->number . ', ' . session('input')['description'],
                     'amount' => $amount,
                     'currency' => $recipientAccount->currency
                 ]);
@@ -110,6 +130,7 @@ class TransactionsController extends Controller
                 }
             }
         }
+        session()->forget(['message', 'code', 'input']);
         return redirect()->route('accounts.show', ['account' => $account->id]);
     }
 }

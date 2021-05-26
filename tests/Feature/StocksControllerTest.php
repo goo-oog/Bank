@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use App\Http\Controllers\StocksController;
 use App\Models\Account;
 use App\Models\Stock;
 use App\Models\Transaction;
@@ -75,7 +74,10 @@ class StocksControllerTest extends TestCase
             'user_id' => $user->id,
             'type' => 'investment'
         ]);
-        $stock = Stock::factory()->create(['account_id' => $account->id]);
+        $stock = Stock::factory()->create([
+            'account_id' => $account->id,
+            'is_active' => false
+        ]);
         $response = $this->delete(route('accounts.stocks.destroy', [$account, $stock]));
         $this->assertDatabaseHas('stocks', ['deleted_at' => Carbon::now()->toDateTimeString()]);
         $response->assertStatus(200);

@@ -23,7 +23,7 @@
                         @endif
                     @endforeach
                     @if ($isInvestmentAccountCreated)
-                        <h2 class="text-gray-800 font-semibold text-xl pb-3">Investment Account</h2>
+                        <h2 class="text-gray-800 font-semibold text-xl pb-3">Investments Account</h2>
                         @foreach($accounts as $account)
                             @if ($account->type==='investment')
                                 @include('components.accounts-list')

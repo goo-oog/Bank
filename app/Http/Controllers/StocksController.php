@@ -96,7 +96,7 @@ class StocksController extends Controller
      */
     public function update(Account $account, Stock $stock)
     {
-        if ($account->user_id === Auth::user()->id) {
+        if ($account->user_id === Auth::user()->id && $stock->account_id === $account->id) {
             $price = $this->stockExchange->currentPrice($stock->symbol);
             $toReceive = (int)round($price * $stock->amount * 100);
             $stock->update([
@@ -124,7 +124,9 @@ class StocksController extends Controller
      */
     public function destroy(Account $account, Stock $stock)
     {
-        if ($account->user_id === Auth::user()->id) {
+        if ($account->user_id === Auth::user()->id
+            && $stock->account_id === $account->id
+            && !$stock->is_active) {
             $stock->delete();
         }
         return redirect()->route('accounts.show', ['account' => $account->id]);

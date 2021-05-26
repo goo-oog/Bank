@@ -20,7 +20,7 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 bg-white border-b border-gray-200">
                     <x-jet-validation-errors class="mb-4" :errors="$errors"/>
-                    <form method="post" action="/accounts/{{$account->id}}/transactions">
+                    <form method="get" action="/code/{{$account->id}}">
                         @csrf
                         <label for="recipient_account" class="mr-2">Recipient's account number:</label><br>
                         <input type="text" autocomplete="off" list="accounts" name="recipient_account"
